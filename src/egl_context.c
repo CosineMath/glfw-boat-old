@@ -125,6 +125,11 @@ static GLFWbool chooseEGLConfig(const _GLFWctxconfig* ctxconfig,
     if (!nativeCount)
     {
         _glfwInputError(GLFW_API_UNAVAILABLE, "EGL: No EGLConfigs returned");
+        
+        #if defined(_GLFW_BOAT)  
+        free(fbcfg);
+        #endif    //_GLFW_BOAT
+        
         return GLFW_FALSE;
     }
 
@@ -522,6 +527,21 @@ GLFWbool _glfwCreateContextEGL(_GLFWwindow* window,
                         "EGL: Failed to find a suitable EGLConfig");
         return GLFW_FALSE;
     }
+#if defined(_GLFW_BOAT)
+    {   
+        int alpha, depth, stencil, r, g, b;
+	int sample_buffers = 0;
+	int samples = 0;
+	eglGetConfigAttrib(_glfw.egl.display, config, EGL_RED_SIZE, &r);
+	eglGetConfigAttrib(_glfw.egl.display, config, EGL_GREEN_SIZE, &g);
+	eglGetConfigAttrib(_glfw.egl.display, config, EGL_BLUE_SIZE, &b);
+	eglGetConfigAttrib(_glfw.egl.display, config, EGL_ALPHA_SIZE, &alpha);
+	eglGetConfigAttrib(_glfw.egl.display, config, EGL_DEPTH_SIZE, &depth);
+	eglGetConfigAttrib(_glfw.egl.display, config, EGL_STENCIL_SIZE, &stencil);
+	__android_log_print(ANDROID_LOG_ERROR, "Boat-GLFW", "Pixel format info: r = %d, g = %d, b = %d, a = %d, depth = %d, stencil = %d, sample buffers = %d, samples = %d", r, g, b, alpha, depth, stencil, sample_buffers, samples);
+    }
+#endif
+    
 #if !defined(_GLFW_BOAT)
     if (ctxconfig->client == GLFW_OPENGL_ES_API)
     {
@@ -601,9 +621,13 @@ GLFWbool _glfwCreateContextEGL(_GLFWwindow* window,
             setAttrib(EGL_CONTEXT_FLAGS_KHR, flags);
     }
     else
-    {
+    {   
+        #if !defined(_GLFW_BOAT)
         if (ctxconfig->client == GLFW_OPENGL_ES_API)
             setAttrib(EGL_CONTEXT_CLIENT_VERSION, ctxconfig->major);
+        #else
+            setAttrib(EGL_CONTEXT_CLIENT_VERSION, 2);
+        #endif
     }
 
     if (_glfw.egl.KHR_context_flush_control)

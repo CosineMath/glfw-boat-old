@@ -30,9 +30,7 @@
 #include <stdint.h>
 #include <dlfcn.h>
 
-#include <android/native_activity.h>
-#include <android/log.h>
-#include <boat_server.h>
+#include <boat.h>
 
 /*
 #include <X11/Xlib.h>
@@ -249,11 +247,11 @@ typedef struct _GLFWlibraryBoat
     char*           clipboardString;
     // Key name string
     char            keynames[GLFW_KEY_LAST + 1][5];
-    // X11 keycode to GLFW key LUT
-    short int       keycodes[256];
-    // GLFW key to X11 keycode LUT
-    short int       scancodes[GLFW_KEY_LAST + 1];
     */
+    // Boat keycode to GLFW key LUT
+    short int       keycodes[256];
+    // GLFW key to Boat keycode LUT
+    short int       scancodes[GLFW_KEY_LAST + 1];
     // Where to place the cursor when re-enabled
     double          restoreCursorPosX, restoreCursorPosY;
     // The window whose disabled cursor mode is active
